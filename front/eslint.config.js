@@ -10,6 +10,6 @@ export default tseslint.config(
         }
     },
     {
-        ignores: ["node_modules/", "dist/", "tests/", "font/"]
+        ignores: ["node_modules/", "dist/", "tests/", "font/", "src/components/ui/"]
     }
 );
