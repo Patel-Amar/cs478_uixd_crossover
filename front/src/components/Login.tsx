@@ -39,7 +39,7 @@ function Login() {
                         <Text fontSize="sm" fontStyle="italic" mt={2}>Vinyl management with a social twist. <br></br>Please enter your details.</Text>
                     </div>
                 </Box>
-                <Box className="login-right" flex="1" bg="#1A202C" alignContent="center" color="white" p={32} >
+                <Box className="login-right" flex="1" bg="#171923" alignContent="center" color="white" p={32} >
                     <VStack align="stretch"> {/* Increased spacing between elements */}
                         <Heading size="3xl" mb={4} >Start your spin</Heading>
 
@@ -48,18 +48,18 @@ function Login() {
                             placeholder="Username" 
                             value={username} 
                             onChange={(e) => setUsername(e.target.value)} 
-                            bg="gray.700" 
+                            bg="#0F1016" 
                             border="none" 
-                            borderColor="blue.500"
+                            borderColor="#2D3748"
                         />
                         <Input 
                             type="password" 
                             placeholder="Password" 
                             value={password} 
                             onChange={(e) => setPassword(e.target.value)} 
-                            bg="gray.700" 
+                            bg="#0F1016" 
                             border="none" 
-                            borderColor="blue.500"
+                            borderColor="#2D3748"
                         />
 
                         {/* Messages (error/success) */}
