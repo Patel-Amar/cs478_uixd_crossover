@@ -31,34 +31,34 @@ function Login() {
 
     return (
         <Flex className="login-container" height="100vh" alignItems="center" justifyContent="center">
-            <Flex className="login-box" width="100%" boxShadow="lg" borderRadius="lg" overflow="hidden" alignItems="center">
-                <Box className="login-left" flex="1" justifyItems="center" bg="black" color="white" p={10} textAlign="left">
+            <Flex className="login-box" width="100%" height={"100%"} boxShadow="lg" borderRadius="lg" overflow="hidden" alignItems="center">
+                <Box className="login-left" flex="1" height="100%" justifyItems="center" bg="black" color="white" p={10} textAlign="left" alignContent={"center"}>
                     <div>
                         <Heading size="7xl">SPiN.</Heading>
                         <Text fontSize="lg" mt={4}>What are you and your friends spinning?</Text>
                         <Text fontSize="sm" fontStyle="italic" mt={2}>Vinyl management with a social twist. <br></br>Please enter your details.</Text>
                     </div>
                 </Box>
-                <Box className="login-right" flex="1" bg="#1A202C" alignContent="center" color="white" p={32} >
+                <Box className="login-right" flex="1" alignContent="center" color="white" p={32} >
                     <VStack align="stretch"> {/* Increased spacing between elements */}
                         <Heading size="3xl" mb={4} >Start your spin</Heading>
 
                         {/* Input fields */}
-                        <Input 
-                            placeholder="Username" 
-                            value={username} 
-                            onChange={(e) => setUsername(e.target.value)} 
-                            bg="gray.700" 
-                            border="none" 
+                        <Input
+                            placeholder="Username"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            bg="gray.700"
+                            border="none"
                             borderColor="blue.500"
                         />
-                        <Input 
-                            type="password" 
-                            placeholder="Password" 
-                            value={password} 
-                            onChange={(e) => setPassword(e.target.value)} 
-                            bg="gray.700" 
-                            border="none" 
+                        <Input
+                            type="password"
+                            placeholder="Password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            bg="gray.700"
+                            border="none"
                             borderColor="blue.500"
                         />
 

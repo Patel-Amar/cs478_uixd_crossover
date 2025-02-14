@@ -1,4 +1,13 @@
 import axios from "axios";
+
+export type albumType = {
+    album_image: string,
+    artists: string[] | [],
+    id: string,
+    name: string,
+    release: string
+
+}
 // https://medium.com/with-orus/the-5-commandments-of-clean-error-handling-in-typescript-93a9cbdf1af5
 function ensureError(value: unknown): Error {
     if (value instanceof Error) return value;

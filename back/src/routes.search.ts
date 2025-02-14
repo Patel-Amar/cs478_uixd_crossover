@@ -52,7 +52,6 @@ async function search(req: Request, res: getResponse) {
 
             let out: output[] = [];
             albums.forEach((element: any) => {
-                console.log(element);
                 element.artists.forEach((artist: any) => {
                     artistNames.push(artist.name)
                 });
@@ -71,7 +70,7 @@ async function search(req: Request, res: getResponse) {
 
                 artistNames = [];
             });
-
+            console.log(out);
             return res.json({ albums: out });
         }
     }
