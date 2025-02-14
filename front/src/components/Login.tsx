@@ -48,18 +48,18 @@ function Login() {
                             placeholder="Username"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
-                            bg="gray.700"
+                            bg="#0F1016"
                             border="none"
-                            borderColor="blue.500"
+                            borderColor="#2D3748"
                         />
                         <Input
                             type="password"
                             placeholder="Password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            bg="gray.700"
+                            bg="#0F1016"
                             border="none"
-                            borderColor="blue.500"
+                            borderColor="#2D3748"
                         />
 
                         {/* Messages (error/success) */}
