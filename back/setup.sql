@@ -2,6 +2,7 @@ CREATE TABLE favorited (
     id INTEGER PRIMARY KEY,
     spotify_id INTEGER,
     category_type INTEGER -- 0 for want and 1 for personal collection
+    favorited INTEGER -- 0 for no and 1 for yes
 );
 
 CREATE TABLE users (
