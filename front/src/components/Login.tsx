@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { Flex, Box, VStack, Heading, Text, Input, Button } from "@chakra-ui/react";
 import "./Login.css";
+import { useNavigate } from "react-router-dom";
 
 function Login() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const [message, setMessage] = useState("");
+    const navigate = useNavigate();
 
     const handleAuth = async (endpoint: "login" | "signup") => {
         setError("");
@@ -18,8 +20,13 @@ function Login() {
                 body: JSON.stringify({ username, password }),
             });
             const data = await response.json();
-            if (!response.ok) throw new Error(data.error);
-            setMessage(data.message);
+            if (!response.ok) {
+                throw new Error(data.error);
+                setMessage(data.message);
+            } else {
+                navigate("/feed");
+
+            }
         } catch (err) {
             if (err instanceof Error) {
                 setError(err.message);

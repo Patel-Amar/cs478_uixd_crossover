@@ -1,8 +1,27 @@
 import { Box, Button, Flex, VStack } from "@chakra-ui/react";
+import axios from "axios";
+// import { useEffect } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 
 function Layout() {
     const navigate = useNavigate();
+    // useEffect(() => { (async() => {
+    //     try {
+    //         await axios.post("/api/authentication", {});
+    //     } catch {
+    //         navigate("/login");
+    //     } 
+    // })();
+    // }, []);
+
+    async function logout() {
+        try {
+            await axios.post("/api/logout", {});
+            navigate("/login");
+        } catch(err) {
+            console.log(err);
+        } 
+    }
 
     return (
         <Flex minH="100vh" alignItems="stretch" backgroundColor="#171923">
@@ -52,6 +71,15 @@ function Layout() {
                         onClick={() => navigate("/wants")}
                     >
                         Wants
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        justifyContent="flex-start"
+                        w="100%"
+                        _hover={{ bg: "gray.700" }}
+                        onClick={() => logout()}
+                    >
+                        Logout
                     </Button>
                 </VStack>
             </Box>

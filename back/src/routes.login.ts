@@ -10,8 +10,14 @@ import express, {
     CookieOptions,
 } from "express";
 import path from "path";
+import { authorize } from "./middleware.js";
 
 let __dirname = path.dirname(url.fileURLToPath(import.meta.url));
+let cookieOptions: CookieOptions={
+    httpOnly:false,
+    secure:true,
+    sameSite:"strict"
+}
 
 let router = express.Router();
 
@@ -73,13 +79,28 @@ function generateToken() {
 
             const token = generateToken();
             await db.run("UPDATE users SET token = ? WHERE id = ?", [token, user.id]);
-            res.cookie("auth_token", token, { httpOnly: true });
+            res.cookie("auth_token", token, cookieOptions);
             res.json({ message: "Login successful." });
         } catch (error) {
             console.error(error);
             res.status(500).json({ error: "Internal server error." });
         }
     });
+
+    // User Logout Route
+    router.post("/logout", async (req: Request, res: Response) => {
+        let { token } = req.cookies;
+        await db.run("UPDATE users SET token = NULL WHERE token = ?", token);
+        return res.clearCookie("auth_token", cookieOptions).send();
+    });
+
+    // User Authentication
+    function authenticateUser(req: Request, res: Response) {
+        res.status(200).json();
+    };
+
+    router.post("/authentication", authorize, authenticateUser);
+
 })();
 
 export default router;
