@@ -1,18 +1,18 @@
 import { Box, Button, Flex, VStack } from "@chakra-ui/react";
 import axios from "axios";
-// import { useEffect } from "react";
+import { useEffect } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 
 function Layout() {
     const navigate = useNavigate();
-    // useEffect(() => { (async() => {
-    //     try {
-    //         await axios.post("/api/authentication", {});
-    //     } catch {
-    //         navigate("/login");
-    //     } 
-    // })();
-    // }, []);
+    useEffect(() => { (async() => {
+        try {
+            await axios.post("/api/authentication", {});
+        } catch {
+            navigate("/login");
+        } 
+    })();
+    }, []);
 
     async function logout() {
         try {

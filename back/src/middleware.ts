@@ -13,12 +13,12 @@ let db = await sqlite.open({
 });
 
 export async function authorize(req: Request, res: Response, next: NextFunction) {
-    let { token } = req.cookies;
-    if (token === undefined) {
+    let { auth_token } = req.cookies;
+    if (auth_token === undefined) {
         return res.status(403).json({ error: ["Unauthorized"] });
     }
 
-    let resp = await db.get("SELECT * FROM users WHERE token = ?", token);
+    let resp = await db.get("SELECT * FROM users WHERE token = ?", auth_token);
     if (!resp) {
         return res.status(403).json({ error: ["Unauthorized"] });
     }
