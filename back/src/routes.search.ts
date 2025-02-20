@@ -70,7 +70,6 @@ async function search(req: Request, res: getResponse) {
 
                 artistNames = [];
             });
-            console.log(out);
             return res.json({ albums: out });
         }
     }
@@ -82,11 +81,9 @@ async function search(req: Request, res: getResponse) {
         return res.status(500).json({ error: [error.toString()] });
     }
 };
-
-router.use("/:search", search);
+router.get("/:search", search);
 
 router.get("/album/:id", async (req: Request, res: Response) => {
-    console.log("Request received for album ID:", req.params.id); // Add this line
     await checkToken();
     try {
         let albumId = req.params.id;

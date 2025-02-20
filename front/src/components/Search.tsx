@@ -24,6 +24,17 @@ function Search() {
         }
     }
 
+    async function getAlbumTrack(album: albumType) {
+        setSelectedAlbum(album);
+        try {
+            const resp = await axios.get(`/api/search/album/${album.id}`);
+            setTracks(resp.data.tracks || []); // Ensure it's an array
+        } catch (error) {
+            console.error("Error fetching album details:", error);
+            setTracks([]); // Set to empty array to avoid crashing
+        }
+    }
+
 
     return (
         <Container
@@ -83,26 +94,13 @@ function Search() {
                         marginBottom={"1vh"}
                     >
                         {albums.map((album, index) => (
-                            <Box 
-                                key={index} 
-                                padding="1rem" 
-                                borderRadius="md" 
+                            <Box
+                                key={index}
+                                padding="1rem"
+                                borderRadius="md"
                                 _hover={{ bg: "#0F1016" }}
                                 cursor="pointer"
-                                onClick={async () => {
-                                    console.log("Album clicked:", album); // Check if album is being passed correctly
-                                    setSelectedAlbum(album);
-                                    try {
-                                        console.log("Fetching tracks for album:", album.id); // Check if album.id is correct
-                                        const resp = await axios.get(`/api/search/album/${album.id}`);
-                                        setTracks(resp.data.tracks || []); // Ensure it's an array
-                                    } catch (error) {
-                                        console.error("Error fetching album details:", error);
-                                        setTracks([]); // Set to empty array to avoid crashing
-                                    }
-                                }}
-                                
-                                
+                                onClick={() => getAlbumTrack(album)}
                             >
                                 <HStack>
                                     <Image src={album.album_image || "/tmp.png"} width={"30%"} />

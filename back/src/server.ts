@@ -3,6 +3,7 @@ import cookieParser from "cookie-parser";
 import { rateLimit } from 'express-rate-limit'
 import searchRouter from './routes.search.js'
 import loginRouter from './routes.login.js'
+import { authorize } from "./middleware.js";
 
 const limiter = rateLimit({
     windowMs: 5 * 60 * 1000,
@@ -20,7 +21,7 @@ app.use(cookieParser());
 const router = express.Router();
 
 router.use("/", loginRouter);
-router.use("/search", searchRouter);
+router.use("/search", authorize, searchRouter);
 
 app.use("/api", router);
 
