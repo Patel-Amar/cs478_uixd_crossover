@@ -104,7 +104,7 @@ function Search() {
                             >
                                 <HStack>
                                     <Image src={album.album_image || "/tmp.png"} width={"30%"} />
-                                    <VStack align={"start"} gap={"0"}>
+                                    <VStack align={"start"} gap={"0.5"} ml={2}>
                                         <Text color="white" fontWeight={"bold"}>{album.name.length > 15 ? album.name.substring(0, 15) + " ..." : album.name}</Text>
                                         <Text color="#E2E8F0">{album.artists?.[0] || ""}</Text>
                                         <Text color="#E2E8F0">{album.release.substring(0, 4) || ""}</Text>
@@ -118,40 +118,56 @@ function Search() {
             </VStack>
 
             <VStack
+                flex="1"
                 width="30%"
-                minHeight={"100%"}
+                minHeight={"90vh"}
                 backgroundColor="#0F1016"
                 borderRadius="8px"
-                boxShadow="lg"
                 color="white"
                 alignItems="center"
-                justifyContent={"start"}
+                justifyContent={"center"}
                 padding="1rem"
             >
                 {selectedAlbum ? (
                     <>
-                        <Image src={selectedAlbum.album_image || "/tmp.png"} width="80%" />
-                        <Heading size="md">{selectedAlbum.name}</Heading>
-                        <Text>{selectedAlbum.artists.join(", ")}</Text>
-                        <Text>{selectedAlbum.release.substring(0, 4)}</Text>
-                        <VStack align="start" width="100%">
-                            {tracks?.length > 0 ? (
-                                tracks.map((track, idx) => (
-                                    <Text key={idx} fontSize="sm">
-                                        {idx + 1}. {track.name}
+                        <Image src={selectedAlbum.album_image || "/tmp.png"} width="100%" />
+                        <VStack width="100%" flex="1" alignItems={"left"} gap={"0.5"} mt={4} mb={4}>
+                            <Heading size="2xl">{selectedAlbum.name}</Heading>
+                            <Text color="#E2E8F0" fontSize="md">{selectedAlbum.artists.join(", ")}</Text>
+                            <Text color="#E2E8F0" fontSize="md">{selectedAlbum.release.substring(0, 4)}</Text>
+                            <VStack align="start" width="100%" mt={4}>
+                                {tracks?.length > 0 ? (
+                                    tracks.map((track, idx) => (
+                                        <HStack 
+                                        key={idx} 
+                                        width="100%" 
+                                        borderBottom={idx === tracks.length - 1 ? "none" : "1px solid #2D3748"} 
+                                        gap={"4"} 
+                                        pb={2}>
+                                            <Text color="#A0AEC0">
+                                                {idx + 1}.
+                                            </Text>
+                                            <Text color="#E2E8F0">
+                                                {track.name}
+                                            </Text>
+                                        </HStack>
+                                    ))
+                                ) : (
+                                    <Text fontSize="sm" color="gray.400">
+                                        Loading tracks...
                                     </Text>
-                                ))
-                            ) : (
-                                <Text fontSize="sm" color="gray.400">
-                                    Loading tracks...
-                                </Text>
-                            )}
+                                )}
+                            </VStack>
                         </VStack>
                     </>
                 ) : (
-                    <Text marginTop={"10%"}>
-                        No Album Selected
-                    </Text>
+                    <VStack color="#718096">
+                        <Heading size="2xl">Vinyl View</Heading>
+                        <Text fontSize="md" textAlign="center" width="75%">
+                            Click on a vinyl to view and
+                            manage all details here
+                        </Text>
+                    </VStack>
                 )}
             </VStack>
 
