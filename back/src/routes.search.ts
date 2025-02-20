@@ -85,4 +85,37 @@ async function search(req: Request, res: getResponse) {
 
 router.use("/:search", search);
 
+router.get("/album/:id", async (req: Request, res: Response) => {
+    console.log("Request received for album ID:", req.params.id); // Add this line
+    await checkToken();
+    try {
+        let albumId = req.params.id;
+        if (!albumId) {
+            return res.status(400).json({ error: "Missing album ID" });
+        }
+
+        let resp = await axios.get(`https://api.spotify.com/v1/albums/${albumId}/tracks`, {
+            headers: {
+                Authorization: `Bearer ${ACCESS_TOKEN}`,
+            },
+            params: {
+                limit: 50,
+            },
+        });
+
+        let tracks = resp.data.items.map((track: any) => ({
+            name: track.name,
+            duration: track.duration_ms,
+        }));
+
+        return res.json({ tracks });
+    } catch (err) {
+        console.error("Error fetching album tracks:", err);
+        return res.status(500).json({ error: "Failed to fetch tracks" });
+    }
+});
+
+
+
+
 export default router;

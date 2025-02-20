@@ -11,6 +11,9 @@ function Search() {
     const [albums, setAlbums] = useState<albumType[]>([]);
     const [search, setSearch] = useState<string>("");
     const [hasresult, setHasresult] = useState<boolean>(true);
+    const [selectedAlbum, setSelectedAlbum] = useState<albumType | null>(null);
+    const [tracks, setTracks] = useState<{ name: string; duration: number }[]>([]);
+
 
     async function searchResults() {
         if (search !== null) {
@@ -80,7 +83,27 @@ function Search() {
                         marginBottom={"1vh"}
                     >
                         {albums.map((album, index) => (
-                            <Box key={index} padding="1rem" borderRadius="md" _hover={{ bg: "#0F1016" }}>
+                            <Box 
+                                key={index} 
+                                padding="1rem" 
+                                borderRadius="md" 
+                                _hover={{ bg: "#0F1016" }}
+                                cursor="pointer"
+                                onClick={async () => {
+                                    console.log("Album clicked:", album); // Check if album is being passed correctly
+                                    setSelectedAlbum(album);
+                                    try {
+                                        console.log("Fetching tracks for album:", album.id); // Check if album.id is correct
+                                        const resp = await axios.get(`/api/search/album/${album.id}`);
+                                        setTracks(resp.data.tracks || []); // Ensure it's an array
+                                    } catch (error) {
+                                        console.error("Error fetching album details:", error);
+                                        setTracks([]); // Set to empty array to avoid crashing
+                                    }
+                                }}
+                                
+                                
+                            >
                                 <HStack>
                                     <Image src={album.album_image || "/tmp.png"} width={"30%"} />
                                     <VStack align={"start"} gap={"0"}>
@@ -91,6 +114,7 @@ function Search() {
                                 </HStack>
                             </Box>
                         ))}
+
                     </Grid>
                 }
             </VStack>
@@ -103,12 +127,36 @@ function Search() {
                 boxShadow="lg"
                 color="white"
                 alignItems="center"
-                justifyContent={"center"}
+                justifyContent={"start"}
+                padding="1rem"
             >
-                <Text marginTop={"10%"}>
-                    No Album Selected
-                </Text>
+                {selectedAlbum ? (
+                    <>
+                        <Image src={selectedAlbum.album_image || "/tmp.png"} width="80%" />
+                        <Heading size="md">{selectedAlbum.name}</Heading>
+                        <Text>{selectedAlbum.artists.join(", ")}</Text>
+                        <Text>{selectedAlbum.release.substring(0, 4)}</Text>
+                        <VStack align="start" width="100%">
+                            {tracks?.length > 0 ? (
+                                tracks.map((track, idx) => (
+                                    <Text key={idx} fontSize="sm">
+                                        {idx + 1}. {track.name}
+                                    </Text>
+                                ))
+                            ) : (
+                                <Text fontSize="sm" color="gray.400">
+                                    Loading tracks...
+                                </Text>
+                            )}
+                        </VStack>
+                    </>
+                ) : (
+                    <Text marginTop={"10%"}>
+                        No Album Selected
+                    </Text>
+                )}
             </VStack>
+
         </Container >
     );
 }
