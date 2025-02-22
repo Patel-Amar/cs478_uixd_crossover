@@ -12,6 +12,16 @@ CREATE TABLE users (
     password TEXT
 );
 
+CREATE TABLE friends (
+    id INTEGER PRIMARY KEY,
+    friend1 INTEGER,
+    friend2 INTEGER,
+    pending INTEGER, -- 0 for accepted and 1 for pending
+    FOREIGN KEY(friend1) REFERENCES users(id),
+    FOREIGN KEY(friend2) REFERENCES users(id),
+    UNIQUE(friend1, friend2)
+);
+
 CREATE TABLE posts (
     id INTEGER PRIMARY KEY,
     post TEXT,

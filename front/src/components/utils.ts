@@ -6,7 +6,11 @@ export type albumType = {
     id: string,
     name: string,
     release: string
+}
 
+export type friendsType = {
+    id: number,
+    friend_username: string
 }
 // https://medium.com/with-orus/the-5-commandments-of-clean-error-handling-in-typescript-93a9cbdf1af5
 function ensureError(value: unknown): Error {

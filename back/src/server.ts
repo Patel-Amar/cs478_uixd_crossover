@@ -2,6 +2,7 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import { rateLimit } from 'express-rate-limit'
 import searchRouter from './routes.search.js'
+import friendRouter from './routes.friends.js'
 import loginRouter from './routes.login.js'
 import { authorize } from "./middleware.js";
 
@@ -22,6 +23,7 @@ const router = express.Router();
 
 router.use("/", loginRouter);
 router.use("/search", authorize, searchRouter);
+router.use("/friends", authorize, friendRouter)
 
 app.use("/api", router);
 
