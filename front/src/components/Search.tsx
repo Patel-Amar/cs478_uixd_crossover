@@ -1,11 +1,12 @@
 import './Search.css';
-import { Button, ButtonGroup, Container, Heading, HStack, Input, VStack, Text, Box, Grid } from "@chakra-ui/react";
+import { Button, ButtonGroup, Container, Heading, HStack, Input, VStack, Text, Box, Grid, IconButton } from "@chakra-ui/react";
 import { LuSearch } from 'react-icons/lu';
 import { InputGroup } from './ui/input-group';
 import { useState } from 'react';
 import axios from 'axios';
 import { Image } from "@chakra-ui/react"
 import { albumType } from './utils';
+import { RiAlbumLine, RiPlayListLine } from 'react-icons/ri'
 
 function Search() {
     const [albums, setAlbums] = useState<albumType[]>([]);
@@ -32,6 +33,28 @@ function Search() {
         } catch (error) {
             console.error("Error fetching album details:", error);
             setTracks([]); // Set to empty array to avoid crashing
+        }
+    }
+
+    async function addAlbumCollection() {
+        try {
+            if (!selectedAlbum) {
+                return;
+            }
+            await axios.post(`/api/favorited/${selectedAlbum.id}/1/0`);
+        } catch (error) {
+            console.error("Error adding album:", error);
+        }
+    }
+
+    async function addAlbumWishlist() {
+        try {
+            if (!selectedAlbum) {
+                return;
+            }
+            await axios.post(`/api/favorited/${selectedAlbum.id}/0/0`);
+        } catch (error) {
+            console.error("Error adding album:", error);
         }
     }
 
@@ -131,10 +154,35 @@ function Search() {
                 {selectedAlbum ? (
                     <>
                         <Image src={selectedAlbum.album_image || "/tmp.png"} width="100%" />
-                        <VStack width="100%" flex="1" alignItems={"left"} gap={"0.5"} mt={4} mb={4}>
-                            <Heading size="2xl">{selectedAlbum.name}</Heading>
-                            <Text color="#E2E8F0" fontSize="md">{selectedAlbum.artists.join(", ")}</Text>
-                            <Text color="#E2E8F0" fontSize="md">{selectedAlbum.release.substring(0, 4)}</Text>
+                        <VStack width="100%" flex="1" alignItems={"left"} gap={"0.5"} mt={4}>
+                            <HStack flex="1" alignItems={"start"}>
+                                <VStack flex="1" alignItems={"left"} mt={1}>
+                                    <Heading size="2xl">{selectedAlbum.name}</Heading>
+                                    <Text color="#E2E8F0" fontSize="md">{selectedAlbum.artists.join(", ")}</Text>
+                                    <Text color="#E2E8F0" fontSize="md">{selectedAlbum.release.substring(0, 4)}</Text>
+                                </VStack>
+                                <HStack>
+                                    <ButtonGroup
+                                        size="md"
+                                        variant="outline"
+                                        border-color="red"
+                                        display="flex"
+                                        justifyContent={"start"}
+                                        width="fit-content"
+                                    >
+                                        <IconButton color="white" onClick={() => addAlbumCollection()}><RiAlbumLine /></IconButton>
+                                    </ButtonGroup>
+                                    <ButtonGroup
+                                        size="md"
+                                        variant="outline"
+                                        display="flex"
+                                        justifyContent={"start"}
+                                        width="fit-content"
+                                    >
+                                        <IconButton color="white" onClick={() => addAlbumWishlist()}><RiPlayListLine /></IconButton>
+                                    </ButtonGroup>
+                                </HStack>
+                            </HStack>
                             <VStack align="start" width="100%" mt={4}>
                                 {tracks?.length > 0 ? (
                                     tracks.map((track, idx) => (
