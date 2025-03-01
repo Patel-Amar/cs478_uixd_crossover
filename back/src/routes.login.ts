@@ -13,11 +13,11 @@ import path from "path";
 import { authorize } from "./middleware.js";
 
 let __dirname = path.dirname(url.fileURLToPath(import.meta.url));
-let cookieOptions: CookieOptions={
-    httpOnly:false,
-    secure:true,
-    sameSite:"strict"
-}
+let cookieOptions: CookieOptions = {
+    httpOnly: false,
+    secure: true,
+    sameSite: "strict",
+};
 
 let router = express.Router();
 
@@ -44,18 +44,28 @@ function generateToken() {
     router.post("/signup", async (req: Request, res: Response) => {
         const { username, password } = req.body;
         if (!username || !password) {
-            return res.status(400).json({ error: "Username and password are required." });
+            return res
+                .status(400)
+                .json({ error: "Username and password are required." });
         }
 
         try {
-            const existingUser = await db.get("SELECT * FROM users WHERE username = ?", [username]);
+            const existingUser = await db.get(
+                "SELECT * FROM users WHERE username = ?",
+                [username]
+            );
             if (existingUser) {
-                return res.status(400).json({ error: "Username already taken." });
+                return res
+                    .status(400)
+                    .json({ error: "Username already taken." });
             }
 
             const hashedPassword = await argon2.hash(password);
             const token = generateToken();
-            await db.run("INSERT INTO users (username, password, token) VALUES (?, ?, ?)", [username, hashedPassword, token]);
+            await db.run(
+                "INSERT INTO users (username, password, token) VALUES (?, ?, ?)",
+                [username, hashedPassword, token]
+            );
             res.cookie("auth_token", token, { httpOnly: true });
             res.json({ message: "User registered successfully." });
         } catch (error) {
@@ -68,17 +78,27 @@ function generateToken() {
     router.post("/login", async (req: Request, res: Response) => {
         const { username, password } = req.body;
         if (!username || !password) {
-            return res.status(400).json({ error: "Username and password are required." });
+            return res
+                .status(400)
+                .json({ error: "Username and password are required." });
         }
 
         try {
-            const user = await db.get("SELECT * FROM users WHERE username = ?", [username]);
+            const user = await db.get(
+                "SELECT * FROM users WHERE username = ?",
+                [username]
+            );
             if (!user || !(await argon2.verify(user.password, password))) {
-                return res.status(401).json({ error: "Invalid username or password." });
+                return res
+                    .status(401)
+                    .json({ error: "Invalid username or password." });
             }
 
             const token = generateToken();
-            await db.run("UPDATE users SET token = ? WHERE id = ?", [token, user.id]);
+            await db.run("UPDATE users SET token = ? WHERE id = ?", [
+                token,
+                user.id,
+            ]);
             res.cookie("auth_token", token, cookieOptions);
             res.json({ message: "Login successful." });
         } catch (error) {
@@ -97,10 +117,9 @@ function generateToken() {
     // User Authentication
     function authenticateUser(req: Request, res: Response) {
         res.status(200).json();
-    };
+    }
 
     router.post("/authentication", authorize, authenticateUser);
-
 })();
 
 export default router;

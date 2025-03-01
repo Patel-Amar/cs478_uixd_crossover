@@ -8,20 +8,27 @@ async function authenticate(callback: Function) {
     }
 
     let data = {
-        grant_type: "client_credentials"
-    }
-    const auth_token = Buffer.from(`${process.env.CLIENT_ID}:${process.env.CLIENT_SECRET}`, 'utf-8').toString('base64');
+        grant_type: "client_credentials",
+    };
+    const auth_token = Buffer.from(
+        `${process.env.CLIENT_ID}:${process.env.CLIENT_SECRET}`,
+        "utf-8"
+    ).toString("base64");
     try {
-        let resp = await axios.post("https://accounts.spotify.com/api/token", data, {
-            headers: {
-                'Authorization': `Basic ${auth_token}`,
-                'Content-Type': 'application/x-www-form-urlencoded'
+        let resp = await axios.post(
+            "https://accounts.spotify.com/api/token",
+            data,
+            {
+                headers: {
+                    Authorization: `Basic ${auth_token}`,
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
             }
-        });
+        );
         ACCESS_TOKEN = resp.data.access_token;
         callback();
     } catch (err) {
-        console.log(err);
+        // console.log(err);
     }
 }
 
@@ -29,7 +36,7 @@ async function checkToken() {
     if (!ACCESS_TOKEN) {
         try {
             await authenticate(() => {
-                console.log('Token is now set:', ACCESS_TOKEN);
+                console.log("Token is now set:", ACCESS_TOKEN);
             });
         } catch (err) {
             console.log(err);
@@ -39,4 +46,4 @@ async function checkToken() {
 
 export default authenticate;
 export { ACCESS_TOKEN };
-export { checkToken }
+export { checkToken };

@@ -1,17 +1,18 @@
 import express from "express";
 import cookieParser from "cookie-parser";
-import { rateLimit } from 'express-rate-limit'
-import searchRouter from './routes.search.js'
-import friendRouter from './routes.friends.js'
-import favoritedRouter from './routes.favorited.js'
-import loginRouter from './routes.login.js'
+import { rateLimit } from "express-rate-limit";
+import searchRouter from "./routes.search.js";
+import friendRouter from "./routes.friends.js";
+import favoritedRouter from "./routes.favorited.js";
+import loginRouter from "./routes.login.js";
 import { authorize } from "./middleware.js";
+import postsRouter from "./routes.post.js";
 
 const limiter = rateLimit({
     windowMs: 5 * 60 * 1000,
     limit: 500,
-    standardHeaders: 'draft-8',
-    legacyHeaders: false
+    standardHeaders: "draft-8",
+    legacyHeaders: false,
 });
 
 let app = express();
@@ -24,11 +25,11 @@ const router = express.Router();
 
 router.use("/", loginRouter);
 router.use("/search", authorize, searchRouter);
-router.use("/friends", authorize, friendRouter)
-router.use("/favorited", authorize, favoritedRouter)
+router.use("/friends", authorize, friendRouter);
+router.use("/favorited", authorize, favoritedRouter);
+router.use("/feed", authorize, postsRouter);
 
 app.use("/api", router);
-
 
 // run server
 let port = 3000;

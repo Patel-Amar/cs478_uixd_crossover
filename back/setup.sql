@@ -3,7 +3,8 @@ CREATE TABLE favorited (
     spotify_id INTEGER,
     category_type INTEGER, -- 0 for want and 1 for personal collection
     favorited INTEGER, -- 0 for no and 1 for yes
-    user_name INTEGER
+    user_name INTEGER,
+    FOREIGN KEY(user_name) REFERENCES users(id)
 );
 
 CREATE TABLE users (
@@ -27,9 +28,8 @@ CREATE TABLE posts (
     id INTEGER PRIMARY KEY,
     post TEXT,
     user_id INTEGER,
-    favorited_id INTEGER,
-    FOREIGN KEY(user_id) REFERENCES users(id),
-    FOREIGN KEY(favorited_id) REFERENCES favorited(id)
+    spotify_id TEXT,
+    FOREIGN KEY(user_id) REFERENCES users(id)
 );
 
 CREATE TABLE comments (
