@@ -107,8 +107,6 @@ router.put("/:spotify_id/:category_type/:favorited", async (req, res) => {
             `UPDATE favorited SET category_type = ?, favorited = ? WHERE spotify_id = ? AND user_name = ?`,
             req.params.category_type, req.params.favorited, req.params.spotify_id, currentUserID
         );
-
-        console.log(req.params.category_type, req.params.favorited, req.params.spotify_id, currentUserID);
         res.status(201).json({ message: "Album updated successfully!" });
 
     } catch (err) {
@@ -184,7 +182,6 @@ router.get("/wishlist", async (req, res) => {
                 const resp = await axios.get(`https://api.spotify.com/v1/albums/${album.spotify_id}`, {
                     headers: { Authorization: `Bearer ${ACCESS_TOKEN}` },
                 });
-                console.log(album.favorited);
                 return {
                     id: resp.data.id,
                     name: resp.data.name,

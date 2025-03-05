@@ -7,13 +7,20 @@ import axios from 'axios';
 import { Image } from "@chakra-ui/react"
 import { albumType } from './utils';
 import { RiAlbumLine, RiIndeterminateCircleLine, RiHeartLine, RiHeartFill } from 'react-icons/ri'
+import {
+    PopoverBody,
+    PopoverContent,
+    PopoverRoot,
+    PopoverTrigger,
+  } from "@/components/ui/popover";
 
 
 function Wants() {
     const [albums, setAlbums] = useState<albumType[]>([]);
-    // const [hasresult, setHasresult] = useState<boolean>(true);
     const [selectedAlbum, setSelectedAlbum] = useState<albumType | null>(null);
     const [tracks, setTracks] = useState<{ name: string; duration: number }[]>([]);
+    const [isCollectionPopoverOpen, setIsCollectionPopoverOpen] = useState(false);
+    const [isRemovePopoverOpen, setIsRemovePopoverOpen] = useState(false);
     
     async function fetchWishlist() {
         try {
@@ -85,15 +92,35 @@ function Wants() {
             if (!selectedAlbum) {
                 return;
             }
-    
             const spotifyId = selectedAlbum.id;
-            await axios.delete(`/api/favorited/album/${spotifyId}`);
+            setIsRemovePopoverOpen(true);
+
+            setTimeout(() => {
+            setIsRemovePopoverOpen(false);
+            axios.delete(`/api/favorited/album/${spotifyId}`);
             console.log("Album removed from wishlist!");
     
             setSelectedAlbum(null);
             fetchWishlist();
+            }, 1500);
         } catch (error) {
             console.error("Error removing album from wishlist:", error);
+        }
+    }
+
+    async function moveAlbum() {
+        try {
+            if (!selectedAlbum) {
+                return;
+            }
+            const spotifyId = selectedAlbum.id;
+            await axios.delete(`/api/favorited/album/${spotifyId}`);
+            console.log("Album moved to collection!");
+    
+            setSelectedAlbum(null);
+            fetchWishlist();
+        } catch (error) {
+            console.error("Error moving album to collection:", error);
         }
     }
 
@@ -102,8 +129,13 @@ function Wants() {
             if (!selectedAlbum) {
                 return;
             }
-            removeAlbum()
-            await axios.post(`/api/favorited/${selectedAlbum.id}/1/0`);
+            setIsCollectionPopoverOpen(true);
+
+            setTimeout(() => {
+            setIsCollectionPopoverOpen(false);
+            moveAlbum();
+            axios.post(`/api/favorited/${selectedAlbum.id}/1/0`);
+            }, 1500);
         } catch (error) {
             console.error("Error adding album:", error);
         }
@@ -186,16 +218,30 @@ function Wants() {
                                     <Text color="#E2E8F0" fontSize="md">{selectedAlbum.release.substring(0, 4)}</Text>
                                 </VStack>
                                 <HStack>
-                                    <ButtonGroup
-                                        size="md"
-                                        variant="outline"
-                                        border-color="red"
-                                        display="flex"
-                                        justifyContent={"start"}
-                                        width="fit-content"
-                                    >
-                                        <IconButton color="white" onClick={() => addAlbumCollection()}><RiAlbumLine /></IconButton>
-                                    </ButtonGroup>
+                                    <PopoverRoot open={isCollectionPopoverOpen} onOpenChange={(details) => setIsCollectionPopoverOpen(details.open)}>
+                                        <PopoverTrigger>
+                                            <ButtonGroup
+                                            size="md"
+                                            variant="outline"
+                                            border-color="red"
+                                            display="flex"
+                                            justifyContent={"start"}
+                                            width="fit-content"
+                                        >
+                                            <IconButton color="white" onClick={() => addAlbumCollection()}><RiAlbumLine /></IconButton>
+                                        </ButtonGroup>
+                                        </PopoverTrigger>
+                                        <PopoverContent
+                                        bg="#1A202C"
+                                        color="white"
+                                        borderRadius="10px"
+                                        width="250px"
+                                        >
+                                        <PopoverBody>
+                                        <Text color="#E2E8F0" fontSize="md">Moved to collection!</Text>
+                                        </PopoverBody>
+                                        </PopoverContent>
+                                    </PopoverRoot>
                                     <ButtonGroup
                                         size="md"
                                         variant="outline"
@@ -205,15 +251,30 @@ function Wants() {
                                     >
                                         <IconButton color="white" onClick={() => addAlbumFavorites()}>{selectedAlbum.favorited === 1 ? <RiHeartFill/> : <RiHeartLine />}</IconButton>
                                     </ButtonGroup>
-                                    <ButtonGroup
-                                        size="md"
-                                        variant="outline"
-                                        display="flex"
-                                        justifyContent={"start"}
-                                        width="fit-content"
-                                    >
-                                        <IconButton color="white" onClick={() => removeAlbum()}><RiIndeterminateCircleLine /></IconButton>
-                                    </ButtonGroup>
+                                    <PopoverRoot open={isRemovePopoverOpen} onOpenChange={(details) => setIsRemovePopoverOpen(details.open)}>
+                                        <PopoverTrigger>
+                                            <ButtonGroup
+                                            size="md"
+                                            variant="outline"
+                                            border-color="red"
+                                            display="flex"
+                                            justifyContent={"start"}
+                                            width="fit-content"
+                                        >
+                                            <IconButton color="white" onClick={() => removeAlbum()}><RiIndeterminateCircleLine /></IconButton>
+                                        </ButtonGroup>
+                                        </PopoverTrigger>
+                                        <PopoverContent
+                                        bg="#1A202C"
+                                        color="white"
+                                        borderRadius="10px"
+                                        width="250px"
+                                        >
+                                        <PopoverBody>
+                                        <Text color="#E2E8F0" fontSize="md">Removed!</Text>
+                                        </PopoverBody>
+                                        </PopoverContent>
+                                    </PopoverRoot>
                                 </HStack>
                             </HStack>
                             <VStack align="start" width="100%" mt={4}>
