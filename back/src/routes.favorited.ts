@@ -115,6 +115,47 @@ router.put("/:spotify_id/:category_type/:favorited", async (req, res) => {
     }
 });
 
+router.get("/collection/favorites", async (req, res) => {
+    try {
+        const { auth_token } = req.cookies;
+        if (!auth_token) {
+            return res.status(401).json({ error: "Not authenticated" });
+        }
+
+        const user = await db.get("SELECT * FROM users WHERE token = ?", auth_token);
+        if (!user) {
+            return res.status(401).json({ error: "Invalid token" });
+        }
+
+        const albums = await db.all(
+            "SELECT spotify_id, favorited FROM favorited WHERE category_type = 1 AND favorited = 1 AND user_name = ?",
+            user.id
+        );
+
+        // Fetch album details from Spotify API for each spotify_id
+        await checkToken();
+        const albumData = await Promise.all(
+            albums.map(async (album) => {
+                const resp = await axios.get(`https://api.spotify.com/v1/albums/${album.spotify_id}`, {
+                    headers: { Authorization: `Bearer ${ACCESS_TOKEN}` },
+                });
+                return {
+                    id: resp.data.id,
+                    name: resp.data.name,
+                    release: resp.data.release_date,
+                    artists: resp.data.artists.map((artist: Artist) => artist.name),
+                    album_image: resp.data.images[0]?.url || null,
+                    favorited: album.favorited
+                };
+            })
+        );
+
+        res.status(200).json({ albums: albumData });
+    } catch (error) {
+        console.error("Error fetching favorites in collection:", error);
+        return res.status(500).json({ error: "Internal server error" });
+    }
+});
 
 router.get("/collection", async (req, res) => {
     try {
@@ -154,6 +195,48 @@ router.get("/collection", async (req, res) => {
         res.status(200).json({ albums: albumData });
     } catch (error) {
         console.error("Error fetching collection:", error);
+        return res.status(500).json({ error: "Internal server error" });
+    }
+});
+
+router.get("/wishlist/favorites", async (req, res) => {
+    try {
+        const { auth_token } = req.cookies;
+        if (!auth_token) {
+            return res.status(401).json({ error: "Not authenticated" });
+        }
+
+        const user = await db.get("SELECT * FROM users WHERE token = ?", auth_token);
+        if (!user) {
+            return res.status(401).json({ error: "Invalid token" });
+        }
+
+        const albums = await db.all(
+            "SELECT spotify_id, favorited FROM favorited WHERE category_type = 0 AND favorited = 1 AND user_name = ?",
+            user.id
+        );
+
+        // Fetch album details from Spotify API for each spotify_id
+        await checkToken();
+        const albumData = await Promise.all(
+            albums.map(async (album) => {
+                const resp = await axios.get(`https://api.spotify.com/v1/albums/${album.spotify_id}`, {
+                    headers: { Authorization: `Bearer ${ACCESS_TOKEN}` },
+                });
+                return {
+                    id: resp.data.id,
+                    name: resp.data.name,
+                    release: resp.data.release_date,
+                    artists: resp.data.artists.map((artist: Artist) => artist.name),
+                    album_image: resp.data.images[0]?.url || null,
+                    favorited: album.favorited
+                };
+            })
+        );
+
+        res.status(200).json({ albums: albumData });
+    } catch (error) {
+        console.error("Error fetching favorites in wishlist:", error);
         return res.status(500).json({ error: "Internal server error" });
     }
 });

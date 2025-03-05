@@ -1,5 +1,5 @@
 import './Collection.css'
-import {ButtonGroup, Container, Heading, HStack, VStack, Text, Box, Grid, IconButton } from "@chakra-ui/react";
+import {ButtonGroup, Container, Heading, HStack, VStack, Text, Box, Grid, IconButton, Button } from "@chakra-ui/react";
 // import { LuSearch } from 'react-icons/lu';
 // import { InputGroup } from './ui/input-group';
 import { useEffect, useState } from 'react';
@@ -20,6 +20,7 @@ function Collection() {
     const [selectedAlbum, setSelectedAlbum] = useState<albumType | null>(null);
     const [tracks, setTracks] = useState<{ name: string; duration: number }[]>([]);
     const [isRemovePopoverOpen, setIsRemovePopoverOpen] = useState(false);
+    const [isFilteringFavorites, setIsFilteringFavorites] = useState(false);
 
     async function fetchCollection() {
         try {
@@ -45,6 +46,21 @@ function Collection() {
         } catch (error) {
             console.error("Error fetching album details:", error);
             setTracks([]);
+        }
+    }
+
+    async function filterFavorites() {
+        try {
+            if (isFilteringFavorites) {
+                fetchCollection();
+            } else {
+                const resp = await axios.get("/api/favorited/collection/favorites");
+                setAlbums(resp.data.albums || []);
+            }
+            setIsFilteringFavorites(!isFilteringFavorites);
+        } catch (error) {
+            console.error("Error fetching collection:", error);
+            setAlbums([]);
         }
     }
 
@@ -124,7 +140,17 @@ function Collection() {
                 color="white"
             >
                 <Container width="90%" padding="0" marginBottom={"1rem"}>
-                    <Heading size="2xl">Collection</Heading>
+                    <HStack flex="1" justifyContent={'space-between'}>
+                        <Heading size="2xl">Collection</Heading>
+                        <Button 
+                            bg={isFilteringFavorites ? "white" : "transparent"} 
+                            color={isFilteringFavorites ? "black" : "white"} 
+                            borderColor={"white"} 
+                            onClick={filterFavorites}
+                        >
+                            Filter by favorites
+                        </Button>
+                    </HStack>
                 </Container>
                 {albums.length===0 ?
                     <Text> No Album Found</Text> :

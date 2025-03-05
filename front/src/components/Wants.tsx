@@ -1,5 +1,5 @@
 import './Wants.css'
-import {ButtonGroup, Container, Heading, HStack, VStack, Text, Box, Grid, IconButton } from "@chakra-ui/react";
+import {ButtonGroup, Container, Heading, HStack, VStack, Text, Box, Grid, IconButton, Button } from "@chakra-ui/react";
 // import { LuSearch } from 'react-icons/lu';
 // import { InputGroup } from './ui/input-group';
 import { useEffect, useState } from 'react';
@@ -21,6 +21,7 @@ function Wants() {
     const [tracks, setTracks] = useState<{ name: string; duration: number }[]>([]);
     const [isCollectionPopoverOpen, setIsCollectionPopoverOpen] = useState(false);
     const [isRemovePopoverOpen, setIsRemovePopoverOpen] = useState(false);
+    const [isFilteringFavorites, setIsFilteringFavorites] = useState(false);
     
     async function fetchWishlist() {
         try {
@@ -35,6 +36,22 @@ function Wants() {
     useEffect(() => {
         fetchWishlist();
     }, []);
+
+
+    async function filterFavorites() {
+        try {
+            if (isFilteringFavorites) {
+                fetchWishlist();
+            } else {
+                const resp = await axios.get("/api/favorited/wishlist/favorites");
+                setAlbums(resp.data.albums || []);
+            }
+            setIsFilteringFavorites(!isFilteringFavorites);
+        } catch (error) {
+            console.error("Error fetching wishlist:", error);
+            setAlbums([]);
+        }
+    }
     
 
     async function getAlbumTrack(album: albumType) {
@@ -158,7 +175,17 @@ function Wants() {
                 color="white"
             >
                 <Container width="90%" padding="0" marginBottom={"1rem"}>
-                    <Heading size="2xl">Wishlist</Heading>
+                    <HStack flex="1" justifyContent={'space-between'}>
+                        <Heading size="2xl">Wishlist</Heading>
+                        <Button 
+                            bg={isFilteringFavorites ? "white" : "transparent"} 
+                            color={isFilteringFavorites ? "black" : "white"} 
+                            borderColor={"white"} 
+                            onClick={filterFavorites}
+                        >
+                            Filter by favorites
+                        </Button>
+                    </HStack>
                 </Container>
                 {albums.length===0 ?
                     <Text> No Album Found</Text> :
