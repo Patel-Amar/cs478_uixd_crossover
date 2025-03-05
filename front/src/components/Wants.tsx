@@ -188,7 +188,7 @@ function Wants() {
                     </HStack>
                 </Container>
                 {albums.length===0 ?
-                    <Text> No Album Found</Text> :
+                    <Text></Text> :
                     <Grid
                         templateColumns="repeat(2, 1fr)"
                         gap={6}
