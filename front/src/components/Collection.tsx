@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Image } from "@chakra-ui/react"
 import { albumType } from './utils';
-import { RiIndeterminateCircleLine, RiHeartLine } from 'react-icons/ri'
+import { RiIndeterminateCircleLine, RiHeartLine, RiHeartFill } from 'react-icons/ri'
 
 function Collection() {
     const [albums, setAlbums] = useState<albumType[]>([]);
@@ -38,6 +38,44 @@ function Collection() {
         } catch (error) {
             console.error("Error fetching album details:", error);
             setTracks([]);
+        }
+    }
+
+    async function addAlbumFavorites() {
+        try {
+            if (!selectedAlbum) {
+                return;
+            }
+
+            if (selectedAlbum.favorited === 0) {
+                await axios.put(`/api/favorited/${selectedAlbum.id}/1/1`);
+                const temp: albumType = {
+                    album_image: selectedAlbum.album_image,
+                    artists: selectedAlbum.artists,
+                    id: selectedAlbum.id,
+                    name: selectedAlbum.name,
+                    release: selectedAlbum.release,
+                    favorited:  1
+                }
+                setSelectedAlbum(temp);
+                console.log("Favorited!");
+            } else {
+                await axios.put(`/api/favorited/${selectedAlbum.id}/1/0`);
+                const temp: albumType = {
+                    album_image: selectedAlbum.album_image,
+                    artists: selectedAlbum.artists,
+                    id: selectedAlbum.id,
+                    name: selectedAlbum.name,
+                    release: selectedAlbum.release,
+                    favorited:  0
+                }
+                setSelectedAlbum(temp);
+                console.log("Favorited!");
+            }
+            fetchCollection();
+                
+        } catch (error) {
+            console.error("Error favoriting album:", error);
         }
     }
 
@@ -98,7 +136,10 @@ function Collection() {
                                 <HStack>
                                     <Image src={album.album_image || "/tmp.png"} width={"30%"} />
                                     <VStack align={"start"} gap={"0.5"} ml={2}>
-                                        <Text color="white" fontWeight={"bold"}>{album.name.length > 15 ? album.name.substring(0, 15) + " ..." : album.name}</Text>
+                                        <HStack>
+                                            <Text color="white" fontWeight={"bold"}>{album.name.length > 15 ? album.name.substring(0, 15) + " ..." : album.name}</Text>
+                                            {album.favorited === 1 ? <RiHeartFill/> : ""}
+                                        </HStack>
                                         <Text color="#E2E8F0">{album.artists?.[0] || ""}</Text>
                                         <Text color="#E2E8F0">{album.release.substring(0, 4) || ""}</Text>
                                     </VStack>
@@ -139,8 +180,8 @@ function Collection() {
                                         justifyContent={"start"}
                                         width="fit-content"
                                     >
-                                        <IconButton color="white"><RiHeartLine /></IconButton>
-                                    </ButtonGroup>
+                                        <IconButton color="white" onClick={() => addAlbumFavorites()}>{selectedAlbum.favorited === 1 ? <RiHeartFill/> : <RiHeartLine />}</IconButton>
+                                        </ButtonGroup>
                                     <ButtonGroup
                                         size="md"
                                         variant="outline"

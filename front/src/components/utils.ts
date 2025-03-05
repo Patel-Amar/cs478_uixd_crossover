@@ -6,6 +6,7 @@ export type albumType = {
   id: string;
   name: string;
   release: string;
+  favorited:  number;
 };
 
 export type friendsType = {

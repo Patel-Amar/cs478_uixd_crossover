@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Image } from "@chakra-ui/react"
 import { albumType } from './utils';
-import { RiAlbumLine, RiIndeterminateCircleLine, RiHeartLine } from 'react-icons/ri'
+import { RiAlbumLine, RiIndeterminateCircleLine, RiHeartLine, RiHeartFill } from 'react-icons/ri'
 
 
 function Wants() {
@@ -47,8 +47,34 @@ function Wants() {
             if (!selectedAlbum) {
                 return;
             }
-            await axios.put(`/api/favorited/${selectedAlbum.id}/0/1`);
-            console.log("Favorited!");
+
+            if (selectedAlbum.favorited === 0) {
+                await axios.put(`/api/favorited/${selectedAlbum.id}/0/1`);
+                const temp: albumType = {
+                    album_image: selectedAlbum.album_image,
+                    artists: selectedAlbum.artists,
+                    id: selectedAlbum.id,
+                    name: selectedAlbum.name,
+                    release: selectedAlbum.release,
+                    favorited:  1
+                }
+                setSelectedAlbum(temp);
+                console.log("Favorited!");
+            } else {
+                await axios.put(`/api/favorited/${selectedAlbum.id}/0/0`);
+                const temp: albumType = {
+                    album_image: selectedAlbum.album_image,
+                    artists: selectedAlbum.artists,
+                    id: selectedAlbum.id,
+                    name: selectedAlbum.name,
+                    release: selectedAlbum.release,
+                    favorited:  0
+                }
+                setSelectedAlbum(temp);
+                console.log("Favorited!");
+            }
+            fetchWishlist();
+                
         } catch (error) {
             console.error("Error favoriting album:", error);
         }
@@ -123,7 +149,10 @@ function Wants() {
                                 <HStack>
                                     <Image src={album.album_image || "/tmp.png"} width={"30%"} />
                                     <VStack align={"start"} gap={"0.5"} ml={2}>
-                                        <Text color="white" fontWeight={"bold"}>{album.name.length > 15 ? album.name.substring(0, 15) + " ..." : album.name}</Text>
+                                        <HStack>
+                                            <Text color="white" fontWeight={"bold"}>{album.name.length > 15 ? album.name.substring(0, 15) + " ..." : album.name}</Text>
+                                            {album.favorited === 1 ? <RiHeartFill/> : ""}
+                                        </HStack>
                                         <Text color="#E2E8F0">{album.artists?.[0] || ""}</Text>
                                         <Text color="#E2E8F0">{album.release.substring(0, 4) || ""}</Text>
                                     </VStack>
@@ -174,7 +203,7 @@ function Wants() {
                                         justifyContent={"start"}
                                         width="fit-content"
                                     >
-                                        <IconButton color="white" onClick={() => addAlbumFavorites()}><RiHeartLine /></IconButton>
+                                        <IconButton color="white" onClick={() => addAlbumFavorites()}>{selectedAlbum.favorited === 1 ? <RiHeartFill/> : <RiHeartLine />}</IconButton>
                                     </ButtonGroup>
                                     <ButtonGroup
                                         size="md"

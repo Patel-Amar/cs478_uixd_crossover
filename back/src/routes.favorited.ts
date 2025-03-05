@@ -108,6 +108,7 @@ router.put("/:spotify_id/:category_type/:favorited", async (req, res) => {
             req.params.category_type, req.params.favorited, req.params.spotify_id, currentUserID
         );
 
+        console.log(req.params.category_type, req.params.favorited, req.params.spotify_id, currentUserID);
         res.status(201).json({ message: "Album updated successfully!" });
 
     } catch (err) {
@@ -130,7 +131,7 @@ router.get("/collection", async (req, res) => {
         }
 
         const albums = await db.all(
-            "SELECT spotify_id FROM favorited WHERE category_type = 1 AND user_name = ?",
+            "SELECT spotify_id, favorited FROM favorited WHERE category_type = 1 AND user_name = ?",
             user.id
         );
 
@@ -147,6 +148,7 @@ router.get("/collection", async (req, res) => {
                     release: resp.data.release_date,
                     artists: resp.data.artists.map((artist: Artist) => artist.name),
                     album_image: resp.data.images[0]?.url || null,
+                    favorited: album.favorited
                 };
             })
         );
@@ -171,7 +173,7 @@ router.get("/wishlist", async (req, res) => {
         }
 
         const albums = await db.all(
-            "SELECT spotify_id FROM favorited WHERE category_type = 0 AND user_name = ?",
+            "SELECT spotify_id, favorited FROM favorited WHERE category_type = 0 AND user_name = ?",
             user.id
         );
 
@@ -182,12 +184,14 @@ router.get("/wishlist", async (req, res) => {
                 const resp = await axios.get(`https://api.spotify.com/v1/albums/${album.spotify_id}`, {
                     headers: { Authorization: `Bearer ${ACCESS_TOKEN}` },
                 });
+                console.log(album.favorited);
                 return {
                     id: resp.data.id,
                     name: resp.data.name,
                     release: resp.data.release_date,
                     artists: resp.data.artists.map((artist: Artist) => artist.name),
                     album_image: resp.data.images[0]?.url || null,
+                    favorited: album.favorited
                 };
             })
         );
