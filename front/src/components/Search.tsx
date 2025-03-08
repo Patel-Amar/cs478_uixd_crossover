@@ -12,6 +12,12 @@ import {
   Grid,
   IconButton,
 } from "@chakra-ui/react";
+import {
+  PopoverBody,
+  PopoverContent,
+  PopoverRoot,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { LuSearch } from "react-icons/lu";
 import { InputGroup } from "./ui/input-group";
 import { useState } from "react";
@@ -28,6 +34,8 @@ function Search() {
   const [tracks, setTracks] = useState<{ name: string; duration: number }[]>(
     []
   );
+  const [isCollectionPopoverOpen, setIsCollectionPopoverOpen] = useState(false);
+  const [isWishlistPopoverOpen, setIsWishlistPopoverOpen] = useState(false);
 
   async function searchResults() {
     if (search !== null) {
@@ -55,6 +63,11 @@ function Search() {
         return;
       }
       await axios.post(`/api/favorited/${selectedAlbum.id}/1/0`);
+      setIsCollectionPopoverOpen(true);
+
+      setTimeout(() => {
+        setIsCollectionPopoverOpen(false);
+      }, 1500);
     } catch (error) {
       console.error("Error adding album:", error);
     }
@@ -66,6 +79,11 @@ function Search() {
         return;
       }
       await axios.post(`/api/favorited/${selectedAlbum.id}/0/0`);
+      setIsWishlistPopoverOpen(true);
+
+      setTimeout(() => {
+        setIsWishlistPopoverOpen(false);
+      }, 1500);
     } catch (error) {
       console.error("Error adding album:", error);
     }
@@ -196,35 +214,63 @@ function Search() {
                   </Text>
                 </VStack>
                 <HStack>
-                  <ButtonGroup
-                    size="md"
-                    variant="outline"
-                    border-color="red"
-                    display="flex"
-                    justifyContent={"start"}
-                    width="fit-content"
-                  >
-                    <IconButton
-                      color="white"
-                      onClick={() => addAlbumCollection()}
+                  <PopoverRoot open={isCollectionPopoverOpen} onOpenChange={(details) => setIsCollectionPopoverOpen(details.open)}>
+                    <PopoverTrigger>
+                      <ButtonGroup
+                      size="md"
+                      variant="outline"
+                      border-color="red"
+                      display="flex"
+                      justifyContent={"start"}
+                      width="fit-content"
                     >
-                      <RiAlbumLine />
-                    </IconButton>
-                  </ButtonGroup>
-                  <ButtonGroup
-                    size="md"
-                    variant="outline"
-                    display="flex"
-                    justifyContent={"start"}
-                    width="fit-content"
-                  >
-                    <IconButton
+                      <IconButton
+                        color="white"
+                        onClick={() => addAlbumCollection()}
+                      >
+                        <RiAlbumLine />
+                      </IconButton>
+                    </ButtonGroup>
+                    </PopoverTrigger>
+                    <PopoverContent
+                      bg="#1A202C"
                       color="white"
-                      onClick={() => addAlbumWishlist()}
+                      borderRadius="10px"
+                      width="250px"
                     >
-                      <RiPlayListLine />
-                    </IconButton>
-                  </ButtonGroup>
+                    <PopoverBody>
+                      <Text color="#E2E8F0" fontSize="md">Added to collection!</Text>
+                    </PopoverBody>
+                    </PopoverContent>
+                  </PopoverRoot>
+                  <PopoverRoot open={isWishlistPopoverOpen} onOpenChange={(details) => setIsWishlistPopoverOpen(details.open)}>
+                    <PopoverTrigger>
+                      <ButtonGroup
+                      size="md"
+                      variant="outline"
+                      display="flex"
+                      justifyContent={"start"}
+                      width="fit-content"
+                    >
+                      <IconButton
+                        color="white"
+                        onClick={() => addAlbumWishlist()}
+                      >
+                        <RiPlayListLine />
+                      </IconButton>
+                    </ButtonGroup>
+                    </PopoverTrigger>
+                    <PopoverContent
+                      bg="#1A202C"
+                      color="white"
+                      borderRadius="10px"
+                      width="250px"
+                    >
+                    <PopoverBody>
+                      <Text color="#E2E8F0" fontSize="md">Added to wishlist!</Text>
+                    </PopoverBody>
+                    </PopoverContent>
+                  </PopoverRoot >
                 </HStack>
               </HStack>
               <VStack align="start" width="100%" mt={4}>

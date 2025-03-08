@@ -120,6 +120,7 @@ function generateToken() {
     }
 
     router.post("/authentication", authorize, authenticateUser);
+
 })();
 
 export default router;

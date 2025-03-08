@@ -1,18 +1,26 @@
 import './Collection.css'
-import {ButtonGroup, Container, Heading, HStack, VStack, Text, Box, Grid, IconButton } from "@chakra-ui/react";
+import {ButtonGroup, Container, Heading, HStack, VStack, Text, Box, Grid, IconButton, Button } from "@chakra-ui/react";
 // import { LuSearch } from 'react-icons/lu';
 // import { InputGroup } from './ui/input-group';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Image } from "@chakra-ui/react"
 import { albumType } from './utils';
-import { RiIndeterminateCircleLine, RiHeartLine } from 'react-icons/ri'
+import { RiIndeterminateCircleLine, RiHeartLine, RiHeartFill } from 'react-icons/ri'
+import {
+    PopoverBody,
+    PopoverContent,
+    PopoverRoot,
+    PopoverTrigger,
+  } from "@/components/ui/popover";
 
 function Collection() {
     const [albums, setAlbums] = useState<albumType[]>([]);
     // const [hasresult, setHasresult] = useState<boolean>(true);
     const [selectedAlbum, setSelectedAlbum] = useState<albumType | null>(null);
     const [tracks, setTracks] = useState<{ name: string; duration: number }[]>([]);
+    const [isRemovePopoverOpen, setIsRemovePopoverOpen] = useState(false);
+    const [isFilteringFavorites, setIsFilteringFavorites] = useState(false);
 
     async function fetchCollection() {
         try {
@@ -41,18 +49,75 @@ function Collection() {
         }
     }
 
+    async function filterFavorites() {
+        try {
+            if (isFilteringFavorites) {
+                fetchCollection();
+            } else {
+                const resp = await axios.get("/api/favorited/collection/favorites");
+                setAlbums(resp.data.albums || []);
+            }
+            setIsFilteringFavorites(!isFilteringFavorites);
+        } catch (error) {
+            console.error("Error fetching collection:", error);
+            setAlbums([]);
+        }
+    }
+
+    async function addAlbumFavorites() {
+        try {
+            if (!selectedAlbum) {
+                return;
+            }
+
+            if (selectedAlbum.favorited === 0) {
+                await axios.put(`/api/favorited/${selectedAlbum.id}/1/1`);
+                const temp: albumType = {
+                    album_image: selectedAlbum.album_image,
+                    artists: selectedAlbum.artists,
+                    id: selectedAlbum.id,
+                    name: selectedAlbum.name,
+                    release: selectedAlbum.release,
+                    favorited:  1
+                }
+                setSelectedAlbum(temp);
+                console.log("Favorited!");
+            } else {
+                await axios.put(`/api/favorited/${selectedAlbum.id}/1/0`);
+                const temp: albumType = {
+                    album_image: selectedAlbum.album_image,
+                    artists: selectedAlbum.artists,
+                    id: selectedAlbum.id,
+                    name: selectedAlbum.name,
+                    release: selectedAlbum.release,
+                    favorited:  0
+                }
+                setSelectedAlbum(temp);
+                console.log("Favorited!");
+            }
+            fetchCollection();
+                
+        } catch (error) {
+            console.error("Error favoriting album:", error);
+        }
+    }
+
     async function removeAlbum() {
         try {
             if (!selectedAlbum) {
                 return;
             }
-    
             const spotifyId = selectedAlbum.id;
-            await axios.delete(`/api/favorited/album/${spotifyId}`);
+            setIsRemovePopoverOpen(true);
+
+            setTimeout(() => {
+            setIsRemovePopoverOpen(false);
+            axios.delete(`/api/favorited/album/${spotifyId}`);
             console.log("Album removed from wishlist!");
     
             setSelectedAlbum(null);
             fetchCollection();
+            }, 1500);
         } catch (error) {
             console.error("Error removing album from wishlist:", error);
         }
@@ -75,10 +140,20 @@ function Collection() {
                 color="white"
             >
                 <Container width="90%" padding="0" marginBottom={"1rem"}>
-                    <Heading size="2xl">Collection</Heading>
+                    <HStack flex="1" justifyContent={'space-between'}>
+                        <Heading size="2xl">Collection</Heading>
+                        <Button 
+                            bg={isFilteringFavorites ? "white" : "transparent"} 
+                            color={isFilteringFavorites ? "black" : "white"} 
+                            borderColor={"white"} 
+                            onClick={filterFavorites}
+                        >
+                            Filter by favorites
+                        </Button>
+                    </HStack>
                 </Container>
                 {albums.length===0 ?
-                    <Text> No Album Found</Text> :
+                    <Text></Text> :
                     <Grid
                         templateColumns="repeat(2, 1fr)"
                         gap={6}
@@ -98,7 +173,10 @@ function Collection() {
                                 <HStack>
                                     <Image src={album.album_image || "/tmp.png"} width={"30%"} />
                                     <VStack align={"start"} gap={"0.5"} ml={2}>
-                                        <Text color="white" fontWeight={"bold"}>{album.name.length > 15 ? album.name.substring(0, 15) + " ..." : album.name}</Text>
+                                        <HStack>
+                                            <Text color="white" fontWeight={"bold"}>{album.name.length > 15 ? album.name.substring(0, 15) + " ..." : album.name}</Text>
+                                            {album.favorited === 1 ? <RiHeartFill/> : ""}
+                                        </HStack>
                                         <Text color="#E2E8F0">{album.artists?.[0] || ""}</Text>
                                         <Text color="#E2E8F0">{album.release.substring(0, 4) || ""}</Text>
                                     </VStack>
@@ -139,18 +217,32 @@ function Collection() {
                                         justifyContent={"start"}
                                         width="fit-content"
                                     >
-                                        <IconButton color="white"><RiHeartLine /></IconButton>
-                                    </ButtonGroup>
-                                    <ButtonGroup
-                                        size="md"
-                                        variant="outline"
-                                        border-color="red"
-                                        display="flex"
-                                        justifyContent={"start"}
-                                        width="fit-content"
-                                    >
-                                        <IconButton color="white" onClick={() => removeAlbum()}><RiIndeterminateCircleLine /></IconButton>
-                                    </ButtonGroup>
+                                        <IconButton color="white" onClick={() => addAlbumFavorites()}>{selectedAlbum.favorited === 1 ? <RiHeartFill/> : <RiHeartLine />}</IconButton>
+                                        </ButtonGroup>
+                                        <PopoverRoot open={isRemovePopoverOpen} onOpenChange={(details) => setIsRemovePopoverOpen(details.open)}>
+                                        <PopoverTrigger>
+                                            <ButtonGroup
+                                            size="md"
+                                            variant="outline"
+                                            border-color="red"
+                                            display="flex"
+                                            justifyContent={"start"}
+                                            width="fit-content"
+                                        >
+                                            <IconButton color="white" onClick={() => removeAlbum()}><RiIndeterminateCircleLine /></IconButton>
+                                        </ButtonGroup>
+                                        </PopoverTrigger>
+                                        <PopoverContent
+                                        bg="#1A202C"
+                                        color="white"
+                                        borderRadius="10px"
+                                        width="250px"
+                                        >
+                                        <PopoverBody>
+                                        <Text color="#E2E8F0" fontSize="md">Removed!</Text>
+                                        </PopoverBody>
+                                        </PopoverContent>
+                                    </PopoverRoot>
                                 </HStack>
                             </HStack>
                             <VStack align="start" width="100%" mt={4}>
