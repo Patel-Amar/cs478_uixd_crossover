@@ -7,6 +7,7 @@ import favoritedRouter from "./routes.favorited.js";
 import loginRouter from "./routes.login.js";
 import { authorize } from "./middleware.js";
 import postsRouter from "./routes.post.js";
+import commentsRouter from "./routes.comments.js"
 
 const limiter = rateLimit({
     windowMs: 5 * 60 * 1000,
@@ -28,6 +29,7 @@ router.use("/search", authorize, searchRouter);
 router.use("/friends", authorize, friendRouter);
 router.use("/favorited", authorize, favoritedRouter);
 router.use("/feed", authorize, postsRouter);
+router.use("/comment", authorize, commentsRouter);
 
 app.use("/api", router);
 
