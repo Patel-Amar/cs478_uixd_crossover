@@ -1,27 +1,30 @@
 import { Box, Button, Flex, VStack, Heading, Text, Icon } from "@chakra-ui/react";
 import axios from "axios";
 import { useEffect } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { RiHomeLine, RiAlbumLine, RiPlayListLine, RiSearchLine, RiTeamLine } from 'react-icons/ri'
 
 function Layout() {
     const navigate = useNavigate();
-    useEffect(() => { (async() => {
-        try {
-            await axios.post("/api/authentication", {});
-        } catch {
-            navigate("/login");
-        } 
-    })();
+    const location = useLocation();
+
+    useEffect(() => {
+        (async () => {
+            try {
+                await axios.post("/api/authentication", {});
+            } catch {
+                navigate("/login");
+            }
+        })();
     }, []);
 
     async function logout() {
         try {
             await axios.post("/api/logout", {});
             navigate("/login");
-        } catch(err) {
+        } catch (err) {
             console.log(err);
-        } 
+        }
     }
 
     return (
@@ -35,6 +38,7 @@ function Layout() {
                         w="70%"
                         _hover={{ bg: "#4A5568" }}
                         onClick={() => navigate("/feed")}
+                        bg={location.pathname === "/feed" ? "#4A5568" : "transparent"}
                     >
                         <Flex align="center" gap={2}>
                             <Icon as={RiHomeLine} boxSize={5} />
@@ -47,6 +51,7 @@ function Layout() {
                         w="70%"
                         _hover={{ bg: "#4A5568" }}
                         onClick={() => navigate("/collection")}
+                        bg={location.pathname === "/collection" ? "#4A5568" : "transparent"}
                     >
                         <Flex align="center" gap={2}>
                             <Icon as={RiAlbumLine} boxSize={5} />
@@ -59,6 +64,7 @@ function Layout() {
                         w="70%"
                         _hover={{ bg: "#4A5568" }}
                         onClick={() => navigate("/wants")}
+                        bg={location.pathname === "/wants" ? "#4A5568" : "transparent"}
                     >
                         <Flex align="center" gap={2}>
                             <Icon as={RiPlayListLine} boxSize={5} />
@@ -71,6 +77,7 @@ function Layout() {
                         w="70%"
                         _hover={{ bg: "#4A5568" }}
                         onClick={() => navigate("/search")}
+                        bg={location.pathname === "/search" ? "#4A5568" : "transparent"}
                     >
                         <Flex align="center" gap={2}>
                             <Icon as={RiSearchLine} boxSize={5} />
@@ -83,6 +90,7 @@ function Layout() {
                         w="70%"
                         _hover={{ bg: "#4A5568" }}
                         onClick={() => navigate("/friends")}
+                        bg={location.pathname === "/friends" ? "#4A5568" : "transparent"}
                     >
                         <Flex align="center" gap={2}>
                             <Icon as={RiTeamLine} boxSize={5} />
@@ -93,7 +101,7 @@ function Layout() {
                         justifyContent="center"
                         w="60%"
                         bg="transparent"
-                        color="white" 
+                        color="white"
                         borderColor={"white"}
                         onClick={() => logout()}
                         mt={6}
